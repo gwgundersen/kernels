@@ -56,29 +56,38 @@ class Mean(Kernel):
 
 class Gauss(Kernel):
 
-    def __init__(self, size=3):
+    def __init__(self, size=3, sigma=1):
         """The Gaussian blur kernel, e.g. 3x3:
 
-        [[ 0.02413748  0.06561246  0.06561246]
-         [ 0.06561246  0.17835317  0.17835317]
-         [ 0.06561246  0.17835317  0.17835317]]
+        [[ 0.07511361  0.1238414   0.07511361]
+         [ 0.1238414   0.20417996  0.1238414 ]
+         [ 0.07511361  0.1238414   0.07511361]]
 
         Weights a pixel and its neighbors by a 2-D Gaussian function. This
         produces a blur that is more subtle than mean blur.
         """
         super().__init__(size)
-        K = np.zeros((size, size))
-        mean = size / 2.0
-        for x in range(size):
-            for y in range(size):
-                K[x, y] = self.gaussian(x, mean) * self.gaussian(y, mean)
-        # Normalize the kernel so that the image does not become darker as the
-        # size increases.
-        self.K = K / K.sum()
+        self.sigma = sigma
 
-    def gaussian(self, z, mean):
-        x = z - mean
-        return (1 / np.sqrt(2 * np.pi)) * np.exp(-(x**2) / 2)
+        K = np.zeros((size, size))
+        center = int(np.floor(self.size / 2))
+        for x in range(-center, center+1):
+            for y in range(-center, center+1):
+                K[x+center, y+center] = self.gaussian(x, y)
+
+        # Normalize so the image does not become darker as the size increases.
+        K /= K.sum()
+        # Gaussian kernel should be symmetric.
+        assert (K == K.T).all()
+        self.K = K
+
+    def gaussian(self, x, y):
+        """Return value from two-dimensional Gaussian function (x, y) is a
+        point relative to the origin. (0, 0) is the center of the distribution.
+        For more, see: https://en.wikipedia.org/wiki/Gaussian_blur.
+        """
+        return (1 / np.sqrt(2 * np.pi * self.sigma**2)) * \
+               np.exp(-(x**2 + y**2) / (2 * self.sigma**2))
 
 
 # Edge detection
