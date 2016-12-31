@@ -7,6 +7,20 @@ import numpy as np
 class Kernel(object):
 
     def __init__(self, size=3):
+        """Construct an image processing kernel. Most Kernel subclasses take
+        `size` as an argument.
+
+        Example for Gauss. Others are similar except the Kernel subclass and
+        additional arguments.
+        -------
+        >>> from PIL import Image
+        >>> from kernels import Gauss
+        >>> data = np.uint8(misc.lena())
+        >>> kernel = Gauss()
+        >>> filtered = kernel.convolve(data)
+        >>> image = Image.fromarray(filtered)
+        >>> image.show()
+        """
         self.size = size
 
     def convolve(self, image, step=1):
