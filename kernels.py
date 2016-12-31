@@ -149,9 +149,9 @@ class Sharpen(Kernel):
     def __init__(self):
         """Kernel for image sharpening:
 
-        [[ 0. -1.  0.]
-         [-1.  5. -1.]
-         [ 0. -1.  0.]]
+        [[ 0 -1  0]
+         [-1  5 -1]
+         [ 0 -1  0]]
 
         Replaces the value of a pixel with a value slightly higher than the
         weighted sum of its neighbors.
