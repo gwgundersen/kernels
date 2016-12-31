@@ -4,6 +4,9 @@
 import numpy as np
 
 
+# Base class
+# -----------------------------------------------------------------------------
+
 class Kernel(object):
 
     def __init__(self, size=3):
