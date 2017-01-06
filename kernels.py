@@ -16,8 +16,10 @@ class Kernel(object):
         Example for Gauss. Others are similar except the Kernel subclass and
         additional arguments.
         -------
+        >>> import numpy as np
         >>> from PIL import Image
         >>> from kernels import Gauss
+        >>> from scipy import misc
         >>> data = np.uint8(misc.lena())
         >>> kernel = Gauss()
         >>> filtered = kernel.convolve(data)
@@ -41,13 +43,30 @@ class Kernel(object):
     def apply(self, X):
         """Apply single matrix convolution and normalize value to [0, 255].
         """
-        value = (X * self.K).sum()
-        return self.normalize(value)
+        value = (X * self._flip(self.K)).sum()
+        return self._normalize(value)
 
-    def normalize(self, value):
+    def _normalize(self, value):
         """Normalize value to range [0, 255].
         """
         return min(255, max(0, value))
+
+    def _flip(self, X):
+        """Flips a matrix twice, once over the horizontal and once over the
+        vertical axes.
+
+        Example
+        -------
+        >>> import numpy as np
+        >>> X = np.array([[1, 2], [3, 4]])
+        >>> X
+        array([[1, 2],
+               [3, 4]])
+        >>> np.fliplr(np.flipud(X))
+        array([[4, 3],
+               [2, 1]])
+        """
+        return np.fliplr(np.flipud(X))
 
 
 # Blur
@@ -161,10 +180,10 @@ class Sobel(Kernel):
         """Overrides the Kernel super class's apply to approximate the Sobel
         gradient magnitude.
         """
-        x = (X * self.Kx)
-        y = (X * self.Ky)
+        x = (X * self._flip(self.Kx))
+        y = (X * self._flip(self.Ky))
         value = np.sqrt(x.sum()**2 + y.sum()**2)
-        return self.normalize(value)
+        return self._normalize(value)
 
 
 # Sharpen
